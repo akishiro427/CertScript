@@ -1,13 +1,7 @@
-!/usr/bin/python3
-
 import argparse
-import os
-import requests
-import subprocess
-import sys
+import getLatestCertDate as cDate
+import renewCert as rCert
 
-
-BASE_URL="http://<IP>"
 
 def chkArgs():
     """
@@ -35,39 +29,11 @@ def chkArgs():
 
     args = parser.parse_args()
     if (args.c):
-      return 'check', args.application, args.domain
+        return 'check', args.application, args.domain
     else:
-      return 'renew', args.application, args.domain
+        return 'renew', args.application, args.domain
 
 
-# cert renew precheckn
-def renewPreCheck():
-    ret = subprocess.run( [CERTBOT, '--dry-run', 'renew'], 
-                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    if (ret.returncode == 0):
-        return(True)
-    else:
-        return(False)
-
-
-
-def getLatestCertificateDate(application, domain):
-    API_URL=BASE_URL + '/certs/latest'
-
- 
-    data={'application':application,'domain':domain}
-    res=requests.get(API_URL, params=data)
- 
-    print(res.json())
-    pass
-
-
-def renew_certificate(application, domain):
-    CERT_DIR_BASE='/etc/letsencrypt/live'
-    CERT_FILES=("fullchain.pem","privkey.pem")
-    CERTBOT='/usr/bin/certbot'
-    RENEW_TEST_OPT="'--dry-run','renew'"
-    pass
 
 #
 # main
@@ -78,8 +44,10 @@ def renew_certificate(application, domain):
 action, application, domain = chkArgs()
 
 if (action == "check"):
-  getLatestCertificateDate(application, domain)
+    code, msg = cDate.getLatestCertDate('localhost:8080', application, domain).getLatestCertDate()
 else:
-  renew_certificate(application, domain)
+    code, msg = rCert.renewCert('localhost:8080', application, domain).renew()
 
-exit(0)
+print(msg)
+exit(code)
+
