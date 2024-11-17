@@ -1,6 +1,5 @@
-import json
-import requests
 
+import requests
 
 class getLatestCertDate():
     
@@ -22,16 +21,18 @@ class getLatestCertDate():
         """
          get latest certifcation update date
          
-         return date format yyyy/mm/ddThh:mm:ss, if cause exception print error massage and exit with code 1
+         return date format yyyy-mm-ddThh:mm:ss, if cause exception print error massage and exit with code 1
         
         """
-        self.apiUrl= 'http://' + self.getIP() + '/certs/latest'
-        self.params = {"application": + self.getApplication(), "domain": self.getDomain()}
+        self.apiUrl= 'http://' + self.getIp() + '/certs/latest'
+        self.params = {"application":self.getApplication(), "domain": self.getDomain()}
         
         try:
-
             self.res = requests.get(self.apiUrl, params=self.params)
-            if (self.res.status_code in [200, 201]):
-                return self.res.json()
+            if (self.res.status_code == 200):
+                # Truncate msec
+                return 0, self.res.json()["date"].split(".")[0]
+            else:
+                return 1, "Cannot get data, status code: " + self.res.status_code
         except requests.exceptions.RequestException as e:
-            return e
+            return 1, e

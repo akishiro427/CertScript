@@ -44,8 +44,10 @@ def chkArgs():
 action, application, domain = chkArgs()
 
 if (action == "check"):
-    cDate.getLatestCertDate('localhost:8080', application, domain).getLatestCertDate()
+    code, msg = cDate.getLatestCertDate('localhost:8080', application, domain).getLatestCertDate()
 else:
-    rCert.renewCert('localhost:8080', application, domain).renew()
+    code, msg = rCert.renewCert('localhost:8080', application, domain).renew()
 
+print(msg)
+exit(code)
 
